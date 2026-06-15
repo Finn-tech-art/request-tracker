@@ -1,0 +1,48 @@
+.form-page {
+    flex:1;
+    display: flex;
+    justify-content: center;
+    padding: 4rem 1rem;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 700px;
+
+}
+
+.form-container h2 {
+    margin-bottom: 1rem;
+}
+
+.form-description {
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    padding: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+button.btn {
+    border: none;
+    cursor: pointer;
+}

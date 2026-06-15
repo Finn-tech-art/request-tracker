@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" width="device-width initial-scale=1.0">
+
+    <title>Submit a request</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/submit.css">
+</head>
+<body>
+    <header class="navbar"> 
+        <div class="logo"> 
+            <h1>Request Tracker</h1> 
+        </div> 
+        <nav> 
+            <ul class="nav-links"> 
+                <li><a href="../index.html">Home</a></li> 
+                <li><a href="./requests.html">Requests</a></li> 
+            </ul> 
+        </nav> 
+    </header>
+
+    <main class="form-page">
+        <section class="form-container">
+            <h2>Submit a request</h2>
+            <p class="form-description">
+                Help us improve our products by submitting feedback,
+                reporting issues, or requesting new features.
+            </p>
+            <form id="request-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="product">Product</label>
+                    <select id="product" name="product" required>
+                        <option value="">Select a product</option>
+                        <option value="ProductA">Product A</option>
+                        <option value="ProductB">Product B</option>
+                        <option value="ProductC">Product C</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="request-type">Request Type</label>
+                    <select id="request-type" name="requestType" required>
+                        <option value="">Select request type</option>
+                        <option value="Bug">Bug</option>
+                        <option value="Feature Request">Feature Request</option>
+                        <option value="General Feedback">General Feedback</option>
+                        <option value="Partnership">Partnership</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="priority">Priority</label>
+                    <select id="priority" name="priority">
+                        <option value="">Select the Priority of your reuest</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="6" placeholder="Describe your request..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit Request</button>
+            </form>
+        </section>
+    </main>
+    <footer class="footer">
+        <div>
+            <p>Let's work together to build better products.</p>
+        </div>
+        <div class="footer-links">
+            <a href="#">Instagram</a>
+            <a href="#">LinkedIn</a>
+            <a href="#">X</a>
+        </div>
+    </footer>
+</body>
+</html>
