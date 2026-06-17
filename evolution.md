@@ -13,5 +13,5 @@ Routes submit a request CTA button to submit.html and view submitted requests CT
 
 Submit.html - contains a html form with the following fields : Name, Email, product, Request Type, Priority, message and the submit button. Not wired to supabse yet and doesn't use javascript validation yet.
 
-Request.html - Contains the request list container. I will add dynamic funcionality later on.
+Requests.html - Contains the request list container. I will add dynamic funcionality later on.
 

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" width="device-width initial-scale=1.0">
+
+        <title>Requests List</title>
+
+        <link rel="stylesheet" href="../css/main.css">
+        <link rel="stylesheet" href="../css/requests.css">
+    </head>
+    <body>
+    <header class="navbar">
+        <div class="logo">
+            <h1>Request Tracker</h1>
+        </div>
+
+        <nav>
+            <ul class="nav-links">
+                <li><a href="./submit.html">Submit</a></li>
+                <li><a href="#">Download</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="requests-page">
+        <section class="request-container">
+            <div class="page-header">
+                <div>
+                    <h2>View all submitted requests here.</h2>
+                    <p>Track the progress of every request.</p>
+                </div>
+
+                <a href="./submit.html" class="btn btn-primary">+ New Request</a>
+            </div>
+            
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Product</th>
+                            <th>Type</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="request-table-body">
+                        <tr>
+                            <td>REQ-001</td>
+                            <td>John Doe</td>
+                            <td>Product A</td>
+                            <td>Bug</td>
+                            <td>High</td>
+                            <td><span class="status open">Open</span>
+                            <td>09/07/2026</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <footer class="footer">
+        <div>
+            <p>Let's work together to build better products.</p>
+        </div>
+        <div class="footer-links">
+            <a href="#">Instagram</a>
+            <a href="#">LinkedIn</a>
+            <a href="#">X</a>
+        </div>
+    </footer>
+    </body>
+</html>

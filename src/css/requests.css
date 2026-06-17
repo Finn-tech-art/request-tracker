@@ -1,0 +1,80 @@
+.request-page {
+    flex: 1;
+    padding: 3rem;
+}
+
+.request-container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 2rem;
+    margin-top: 1rem;
+    margin-left: 1rem;
+    margin-right: 4rem;
+}
+
+.page-header p {
+    color: #666;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border: 1px solid #ddd;
+    border-radius: 10px
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #f5f5f5;
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+tbody tr:hover {
+    background: #fafafa;
+}
+
+.status {
+    padding: .4rem .8rem;
+    border-radius: 20px;
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+.open {
+    background: #FFE9A8;
+}
+
+.progress {
+    background: #BFE3FF;
+}
+
+.closed {
+    background: #C9F7C9;
+}
+
+@media (max-width: 768px){
+    .requests-page {
+        padding: 4rem;
+    }
+
+    .page-header{
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+}
