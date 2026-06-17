@@ -15,3 +15,30 @@ Submit.html - contains a html form with the following fields : Name, Email, prod
 
 Requests.html - Contains the request list container. I will add dynamic funcionality later on.
 
+I added a login functionality. login.html, auth.css and a dashboard for the reviewers- dashboard.html
+
+---------------------------------------------------------------
+
+The next thing I did was to add the javascript architecture.This makes the app live and dynamic 
+
+app.js - starts the application. (initialize app -> determine current page -> load correct controller)
+
+submitController.js - responsible for the submit page ( listen for form submission -> validate -> call requestService -> display success message -> redirect)
+
+requestController.js - responsible for the requests.html (load requests -> ask render.js to display them -> handle search -> handle filters -> handle sorting)
+
+requestService.js - create request , update request, delete request, get all requests, get one request.
+
+render.js - contains all DOM rendering. renderRequestTable() renderStatus() renderCards()
+
+validator.js - form validation
+helper.js - small reusable utilities.
+
+requestModel.js - defines what a request object looks like.
+
+
+
+After that I tested by submitting a request from the form ( saving it to local storage) and having it automatically display in the requests.html page.
+
+Then I added  search, filter by status and sort by date functionalities.
+

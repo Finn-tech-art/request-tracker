@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard | Request Tracker</title>
+
+<link rel="stylesheet" href="../css/main.css">
+
+<link rel="stylesheet" href="../css/requests.css">
+
+</head>
+
+<body>
+
+<header class="navbar">
+
+<div class="logo">
+
+<h1>Request Tracker Admin</h1>
+
+</div>
+
+<nav>
+
+<ul class="nav-links">
+
+<li><a href="../index.html">Home</a></li>
+
+<li><a href="./requests.html">Requests</a></li>
+
+<li><a href="./submit.html">Submit</a></li>
+
+<li><a href="./login.html">Logout</a></li>
+
+</ul>
+
+</nav>
+
+</header>
+
+<main class="requests-page dashboard">
+
+<div class="requests-container">
+
+<h2>Dashboard</h2>
+
+<p>Overview of all submitted requests.</p>
+
+<br>
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;">
+
+<div class="table-wrapper" style="padding:20px;">
+<h3>Total Requests</h3>
+<h1 id="totalRequests">0</h1>
+</div>
+
+<div class="table-wrapper" style="padding:20px;">
+<h3>Open</h3>
+<h1 id="openRequests">0</h1>
+</div>
+
+<div class="table-wrapper" style="padding:20px;">
+<h3>In Progress</h3>
+<h1 id="progressRequests">0</h1>
+</div>
+
+<div class="table-wrapper" style="padding:20px;">
+<h3>Resolved</h3>
+<h1 id="resolvedRequests">0</h1>
+</div>
+
+</div>
+
+<br><br>
+
+<div class="table-wrapper">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+
+<th>Name</th>
+
+<th>Type</th>
+
+<th>Status</th>
+
+<th>Priority</th>
+
+</tr>
+
+</thead>
+
+<tbody id="recentRequests">
+
+<tr>
+
+<td colspan="5" style="text-align:center">
+
+No requests available.
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</main>
+
+<footer class="footer">
+
+<p>Request Tracker Dashboard</p>
+
+</footer>
+
+<script type="module" src="../js/app.js"></script>
+
+</body>
+
+</html>
+

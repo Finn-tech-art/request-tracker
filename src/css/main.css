@@ -80,3 +80,7 @@ body {
     text-decoration: none;
     color: #666;
 }
+
+.dashboard {
+    margin: 2rem;
+}
