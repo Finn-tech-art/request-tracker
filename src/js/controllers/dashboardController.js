@@ -1,5 +1,6 @@
 import requestService from "../services/requestService.js";
 import { formatDate } from "../utils/helper.js";
+import { showRequestModal } from "../ui/modal.js";
 
 export function initializeDashboardPage() {
     const totalEl = document.getElementById("totalRequests");
@@ -25,7 +26,7 @@ export function initializeDashboardPage() {
         } else {
             const sorted = requests.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             recentEl.innerHTML = sorted.slice(0, 10).map(r => `
-                <tr>
+                <tr data-id="${r.id}">
                     <td>${r.id}</td>
                     <td>${r.name}</td>
                     <td>${r.requestType}</td>
@@ -34,5 +35,16 @@ export function initializeDashboardPage() {
                 </tr>
             `).join("");
         }
+    }
+
+    if (recentEl) {
+        recentEl.addEventListener('click', (e) => {
+            const tr = e.target.closest('tr');
+            if (!tr) return;
+            const id = tr.dataset.id;
+            if (!id) return;
+            const req = requestService.getById(id);
+            if (req) showRequestModal(req);
+        });
     }
 }

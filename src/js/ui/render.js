@@ -25,22 +25,14 @@ export function renderRequests(requests) {
 
     table.innerHTML = requests
         .map(request => `
-            <tr>
-
+            <tr data-id="${request.id}">
                 <td>${request.id}</td>
-
                 <td>${request.name}</td>
-
                 <td>${request.product}</td>
-
                 <td>${request.requestType}</td>
-
                 <td>${request.priority}</td>
-
                 <td>${request.status}</td>
-
                 <td>${formatDate(request.createdAt)}</td>
-
             </tr>
         `)
         .join("");

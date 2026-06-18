@@ -35,7 +35,7 @@ validator.js - form validation
 helper.js - small reusable utilities.
 
 requestModel.js - defines what a request object looks like.
-
+modal.js - allows you to click on a request row and get details about the request.
 
 
 After that I tested by submitting a request from the form ( saving it to local storage) and having it automatically display in the requests.html page.
