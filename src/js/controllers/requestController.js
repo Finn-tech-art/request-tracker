@@ -8,12 +8,14 @@ export function initializeRequestPage() {
 
     const searchInput = document.getElementById('search-input');
     const statusFilter = document.getElementById('status-filter');
+    const productFilter = document.getElementById('product-filter');
     const sortSelect = document.getElementById('sort-select');
     const tbody = document.getElementById('request-table-body');
 
     function renderFiltered() {
         const searchValue = (searchInput?.value || '').trim().toLowerCase();
         const statusValue = statusFilter?.value || '';
+        const productValue = productFilter?.value || '';
         const sortValue = sortSelect?.value || 'newest';
 
         let filtered = allRequests.slice();
@@ -28,6 +30,10 @@ export function initializeRequestPage() {
         if (statusValue) {
             filtered = filtered.filter(r => ((r.status || '').toLowerCase() === statusValue.toLowerCase()));
         }
+
+            if (productValue) {
+                filtered = filtered.filter(r => ((r.product || '') === productValue));
+            }
 
         filtered.sort((a, b) => {
             const da = new Date(a.createdAt || 0);
@@ -48,9 +54,17 @@ export function initializeRequestPage() {
 
     if (searchInput) searchInput.addEventListener('input', debounce(renderFiltered, 250));
     if (statusFilter) statusFilter.addEventListener('change', renderFiltered);
+    if (productFilter) productFilter.addEventListener('change', renderFiltered);
     if (sortSelect) sortSelect.addEventListener('change', renderFiltered);
 
     // initial render
+    // populate product filter options dynamically from data
+    if (productFilter) {
+        const products = Array.from(new Set(allRequests.map(r => r.product).filter(Boolean)));
+        const opts = ["<option value=\"\">All products</option>", ...products.map(p => `<option value="${p}">${p}</option>`)].join('');
+        productFilter.innerHTML = opts;
+    }
+
     renderFiltered();
 
     if (tbody) {
