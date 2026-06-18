@@ -4,8 +4,8 @@ export default class Request {
         name,
         email,
         product,
-        requesType,
-        priority,
+        requestType,
+        priority = "",
         message,
         status = "Open",
         createdAt = new Date().toISOString()
@@ -19,6 +19,5 @@ export default class Request {
         this.message = message;
         this.status = status;
         this.createdAt = createdAt;
-
     }
 }

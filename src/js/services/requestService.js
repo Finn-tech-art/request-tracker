@@ -25,13 +25,8 @@ class RequestService {
     }
 
     getById(id) {
-        return getRequests().find(
-            request => request.id === id
-        );
-
-        if (!request) return;
-        request.status = status;
-        saveRequests(requests);
+        const requests = getRequests();
+        return requests.find(request => request.id === id);
     }
 }
 
