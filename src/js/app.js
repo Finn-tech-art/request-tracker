@@ -1,6 +1,7 @@
 
 import { initializeSubmitPage } from "./controllers/submitController.js";
 import { initializeRequestPage } from "./controllers/requestController.js";
+import { initializeDashboardPage } from "./controllers/dashboardController.js";
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -16,6 +17,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         initializeRequestPage();
 
+    }
+    if (page.includes("dashboard.html")) {
+        initializeDashboardPage();
     }
 
 });

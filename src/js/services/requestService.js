@@ -1,5 +1,5 @@
 import Request from"../models/requestModel.js";
-import { generateRequestId } from "../utils/helper";
+import { generateRequestId } from "../utils/helper.js";
 
 import {
     getRequests,
