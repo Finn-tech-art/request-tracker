@@ -1,4 +1,5 @@
 import { formatDate } from "../utils/helper.js";
+import requestService from "../services/requestService.js";
 
 function escapeHtml(str) {
     if (!str) return "";
@@ -10,7 +11,7 @@ function escapeHtml(str) {
         .replace(/'/g, "&#039;");
 }
 
-export function showRequestModal(request) {
+export function showRequestModal(request, { editable = false } = {}) {
     closeRequestModal();
 
     const overlay = document.createElement("div");
@@ -28,12 +29,25 @@ export function showRequestModal(request) {
           <p><strong>Product:</strong> ${escapeHtml(request.product || "")}</p>
           <p><strong>Priority:</strong> ${escapeHtml(request.priority || "")}</p>
           <p><strong>Status:</strong> ${escapeHtml(request.status || "")}</p>
+          ${editable ? `
+          <div style="margin-top:6px;">
+            <label for="rt-status-select"><strong>Change status:</strong></label>
+            <select id="rt-status-select" style="margin-left:8px;padding:6px;border-radius:6px;border:1px solid #ddd">
+              <option value="Open" ${request.status === 'Open' ? 'selected' : ''}>Open</option>
+              <option value="In Progress" ${request.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+              <option value="In-Progress" ${request.status === 'In-Progress' ? 'selected' : ''}>In-Progress</option>
+              <option value="Resolved" ${request.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+              <option value="Closed" ${request.status === 'Closed' ? 'selected' : ''}>Closed</option>
+            </select>
+          </div>
           <hr>
+          ` : '<hr>'}
           <div class="rt-modal-message">${escapeHtml(request.message || "").replace(/\n/g, "<br>")}</div>
           <p class="rt-modal-date"><small>Submitted: ${formatDate(request.createdAt)}</small></p>
         </div>
         <footer class="rt-modal-footer">
           <button class="btn btn-secondary rt-modal-close">Close</button>
+          ${editable ? '<button class="btn btn-primary rt-modal-save">Save</button>' : ''}
         </footer>
       </div>
     `;
@@ -61,12 +75,32 @@ export function showRequestModal(request) {
         .rt-modal .btn{padding:8px 12px;border-radius:6px;border:1px solid transparent;cursor:pointer;font-weight:600}
         .rt-modal .btn-secondary{background:#f5f5f5;border-color:#e6e6e6;color:#222}
         .rt-modal .btn-primary{background:#2563eb;color:#fff;border-color:#1e40af}
+        .rt-modal .rt-modal-save{background:#000;color:#fff;border-color:#000}
+        .rt-modal .rt-modal-save:hover{background:#111}
         @media (max-width:480px){.rt-modal{padding:14px}.rt-modal-header h2{font-size:1rem}.rt-modal-body{font-size:0.95rem}}
         `;
         document.head.appendChild(style);
     }
 
     overlay.querySelectorAll('.rt-modal-close').forEach(btn => btn.addEventListener('click', closeRequestModal));
+
+    if (editable) {
+      const saveBtn = overlay.querySelector('.rt-modal-save');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+          const sel = overlay.querySelector('#rt-status-select');
+          if (!sel) return;
+          const newStatus = sel.value;
+          if (!newStatus) return;
+          try {
+            requestService.update(request.id, { status: newStatus });
+          } catch (e) {
+            console.error('Failed to update request status', e);
+          }
+          closeRequestModal();
+        });
+      }
+    }
 
     overlay.addEventListener('click', (e) => {
         if (e.target === overlay) closeRequestModal();

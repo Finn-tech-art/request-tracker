@@ -4,7 +4,7 @@ import { renderRequests } from "../ui/render.js";
 import { showRequestModal } from "../ui/modal.js";
 
 export function initializeRequestPage() {
-    const allRequests = requestService.getAll() || [];
+    let allRequests = requestService.getAll() || [];
 
     const searchInput = document.getElementById('search-input');
     const statusFilter = document.getElementById('status-filter');
@@ -67,6 +67,17 @@ export function initializeRequestPage() {
 
     renderFiltered();
 
+    // Update local data and re-render when a request is changed elsewhere
+    window.addEventListener('request-updated', () => {
+        allRequests = requestService.getAll() || [];
+        if (productFilter) {
+            const products = Array.from(new Set(allRequests.map(r => r.product).filter(Boolean)));
+            const opts = ["<option value=\"\">All products</option>", ...products.map(p => `<option value="${p}">${p}</option>`)].join('');
+            productFilter.innerHTML = opts;
+        }
+        renderFiltered();
+    });
+
     if (tbody) {
         tbody.addEventListener("click", (e) => {
             const tr = e.target.closest("tr");
@@ -74,7 +85,7 @@ export function initializeRequestPage() {
             const id = tr.dataset.id;
             if (!id) return;
             const req = requestService.getById(id);
-            if (req) showRequestModal(req);
+            if (req) showRequestModal(req, { editable: false });
         });
     }
 
