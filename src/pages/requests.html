@@ -33,6 +33,24 @@
                 <a href="./submit.html" class="btn btn-primary">+ New Request</a>
             </div>
             
+            <div class="controls" style="display:flex;gap:8px;align-items:center;margin:14px 0;flex-wrap:wrap">
+                <input id="search-input" type="search" placeholder="Search requests by name, email, product, or message" aria-label="Search requests" style="padding:8px;border-radius:6px;border:1px solid #ccc;min-width:220px;">
+
+                <select id="status-filter" aria-label="Filter by status" style="padding:8px;border-radius:6px;border:1px solid #ccc;">
+                    <option value="">All statuses</option>
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="In-Progress">In-Progress</option>
+                    <option value="Resolved">Resolved</option>
+                    <option value="Closed">Closed</option>
+                </select>
+
+                <select id="sort-select" aria-label="Sort by date" style="padding:8px;border-radius:6px;border:1px solid #ccc;">
+                    <option value="newest">Newest</option>
+                    <option value="oldest">Oldest</option>
+                </select>
+            </div>
+            
             <div class="table-wrapper">
                 <table>
                     <thead>

@@ -4,12 +4,55 @@ import { renderRequests } from "../ui/render.js";
 import { showRequestModal } from "../ui/modal.js";
 
 export function initializeRequestPage() {
+    const allRequests = requestService.getAll() || [];
 
-    const requests = requestService.getAll();
+    const searchInput = document.getElementById('search-input');
+    const statusFilter = document.getElementById('status-filter');
+    const sortSelect = document.getElementById('sort-select');
+    const tbody = document.getElementById('request-table-body');
 
-    renderRequests(requests);
+    function renderFiltered() {
+        const searchValue = (searchInput?.value || '').trim().toLowerCase();
+        const statusValue = statusFilter?.value || '';
+        const sortValue = sortSelect?.value || 'newest';
 
-    const tbody = document.getElementById("request-table-body");
+        let filtered = allRequests.slice();
+
+        if (searchValue) {
+            filtered = filtered.filter(r => {
+                const hay = `${r.id} ${r.name} ${r.email} ${r.product} ${r.requestType} ${r.message}`.toLowerCase();
+                return hay.includes(searchValue);
+            });
+        }
+
+        if (statusValue) {
+            filtered = filtered.filter(r => ((r.status || '').toLowerCase() === statusValue.toLowerCase()));
+        }
+
+        filtered.sort((a, b) => {
+            const da = new Date(a.createdAt || 0);
+            const db = new Date(b.createdAt || 0);
+            return sortValue === 'oldest' ? (da - db) : (db - da);
+        });
+
+        renderRequests(filtered);
+    }
+
+    function debounce(fn, delay = 250) {
+        let t;
+        return (...args) => {
+            clearTimeout(t);
+            t = setTimeout(() => fn.apply(this, args), delay);
+        };
+    }
+
+    if (searchInput) searchInput.addEventListener('input', debounce(renderFiltered, 250));
+    if (statusFilter) statusFilter.addEventListener('change', renderFiltered);
+    if (sortSelect) sortSelect.addEventListener('change', renderFiltered);
+
+    // initial render
+    renderFiltered();
+
     if (tbody) {
         tbody.addEventListener("click", (e) => {
             const tr = e.target.closest("tr");
