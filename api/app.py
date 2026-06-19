@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Header, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import Response
 from pydantic import BaseModel
 import jwt
 import httpx
@@ -164,3 +166,20 @@ async def patch_request(request_id: str, patch: dict, authorization: Optional[st
     # Apply patch via Supabase REST
     updated = await _call_supabase('PATCH', f"/requests", json_payload=patch, params={'id': f'eq.{request_id}'})
     return updated[0] if isinstance(updated, list) and len(updated) > 0 else updated
+
+
+@app.get('/js/config/config.js')
+async def serve_config_js():
+        # Provide a small runtime config module so the frontend can find the same-origin API.
+        js = """export default {
+    AUTH_API_URL: (typeof window !== 'undefined' ? window.location.origin : null),
+    SUPABASE_URL: null,
+    SUPABASE_ANON_KEY: null
+};
+"""
+        return Response(content=js, media_type='application/javascript')
+
+
+# Serve the static frontend from the `src` directory so the Python service can be the sole origin.
+STATIC_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
+app.mount('/', StaticFiles(directory=STATIC_DIR, html=True), name='static')

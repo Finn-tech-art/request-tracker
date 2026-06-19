@@ -3,3 +3,4 @@ uvicorn[standard]
 PyJWT
 python-dotenv
 httpx
+aiofiles
