@@ -42,3 +42,10 @@ After that I tested by submitting a request from the form ( saving it to local s
 
 Then I added  search, filter by status and sort by date functionalities.
 
+
+I then added the admin privileges where they are allowed to edit the review status.
+
+To handle admin login using a hardcoded username and password that I provide as environment variables ... I used python-dotenv 
+I had trouble with how I was gonna host the app now that I was using python to handle login in which meant the app needed a backend ... I decided to use render to host the app. So i needed an api
+found at app.py
+

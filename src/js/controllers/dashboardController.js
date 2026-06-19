@@ -1,8 +1,13 @@
 import requestService from "../services/requestService.js";
 import { formatDate } from "../utils/helper.js";
 import { showRequestModal } from "../ui/modal.js";
+import authService from "../services/authService.js";
 
 export function initializeDashboardPage() {
+    if (!authService.isLoggedIn()) {
+        window.location.href = './login.html';
+        return;
+    }
     const totalEl = document.getElementById("totalRequests");
     const openEl = document.getElementById("openRequests");
     const progressEl = document.getElementById("progressRequests");
@@ -52,7 +57,7 @@ export function initializeDashboardPage() {
             const id = tr.dataset.id;
             if (!id) return;
             const req = requestService.getById(id);
-            if (req) showRequestModal(req, { editable: true });
+            if (req) showRequestModal(req, { editable: authService.isAdmin() });
         });
     }
 }

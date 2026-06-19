@@ -2,3 +2,4 @@
 .vscode/
 node-modules/
 .DS_Store
+.venv
