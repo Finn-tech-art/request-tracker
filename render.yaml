@@ -3,7 +3,7 @@
 
 services:
   - type: web
-    name: request-tracker-auth
+    name: request-tracker
     env: python
     plan: free
     buildCommand: pip install -r api/requirements.txt
@@ -19,17 +19,5 @@ services:
         value: ""
       - key: SUPABASE_ANON_KEY
         value: ""
-
-  - type: static
-    name: request-tracker-frontend
-    env: static
-    plan: free
-    buildCommand: node scripts/generate-config-from-env.js
-    publishPath: src
-    envVars:
-      - key: AUTH_API_URL
-        value: "https://your-auth-service.onrender.com"
-      - key: SUPABASE_URL
-        value: ""
-      - key: SUPABASE_ANON_KEY
+      - key: SUPABASE_SERVICE_KEY
         value: ""
