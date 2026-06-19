@@ -6,6 +6,7 @@ let useSupabase = false;
 let SUPABASE_URL = null;
 let SUPABASE_ANON_KEY = null;
 const bc = (typeof window !== 'undefined' && 'BroadcastChannel' in window) ? new BroadcastChannel('request-tracker') : null;
+const lsKey = '__rt_sync_v1';
 
 function broadcast(detail) {
     if (typeof window !== 'undefined' && window.dispatchEvent) {
@@ -19,6 +20,15 @@ function broadcast(detail) {
     try {
         if (bc && (!detail || detail.source !== 'bc')) {
             bc.postMessage(detail || { type: 'ping' });
+        }
+    } catch (e) {
+        // ignore
+    }
+    // localStorage fallback for cross-tab sync in browsers without BroadcastChannel
+    try {
+        if (typeof window !== 'undefined' && window.localStorage && (!detail || detail.source !== 'ls')) {
+            const payload = { ts: Date.now(), d: detail || { type: 'ping' } };
+            try { window.localStorage.setItem(lsKey, JSON.stringify(payload)); } catch (e) { /* ignore quota issues */ }
         }
     } catch (e) {
         // ignore
@@ -105,6 +115,23 @@ class RequestService {
                 }
             };
         }
+
+        // localStorage storage-event fallback for browsers that don't support BroadcastChannel
+        if (typeof window !== 'undefined' && window.addEventListener) {
+            window.addEventListener('storage', async (ev) => {
+                if (!ev || ev.key !== lsKey) return;
+                try {
+                    const payload = ev.newValue ? JSON.parse(ev.newValue) : null;
+                    // fetch fresh data from Supabase
+                    const rows = await fetchFromSupabase();
+                    cache.length = 0;
+                    cache.push(...rows);
+                    broadcast(Object.assign({ type: 'synced', source: 'ls' }, (payload && payload.d) || {}));
+                } catch (err) {
+                    console.error('Failed to refresh requests from Supabase on storage event', err);
+                }
+            });
+        }
     }
 
     async create(data) {
@@ -147,7 +174,7 @@ class RequestService {
         return cache.find(r => r.id === id) || null;
     }
 
-    update(id, changes) {
+    async update(id, changes) {
         const idx = cache.findIndex(r => r.id === id);
         if (idx === -1) return null;
         const updated = { ...cache[idx], ...changes };
