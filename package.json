@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "serve -s src -l $PORT",
+    "start": "serve src -l $PORT",
     "generate-config": "node scripts/generate-config-from-env.js"
   },
   "dependencies": {
