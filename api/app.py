@@ -182,4 +182,23 @@ async def serve_config_js():
 
 # Serve the static frontend from the `src` directory so the Python service can be the sole origin.
 STATIC_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
+@app.get("/__debug/static-files")
+async def debug_static_files():
+    pages_dir = os.path.join(STATIC_DIR, "pages")
+
+    def list_dir(path):
+        try:
+            return sorted(os.listdir(path))
+        except Exception as exc:
+            return {"error": str(exc)}
+
+    return {
+        "cwd": os.getcwd(),
+        "static_dir": STATIC_DIR,
+        "static_dir_exists": os.path.isdir(STATIC_DIR),
+        "static_dir_files": list_dir(STATIC_DIR),
+        "pages_dir": pages_dir,
+        "pages_dir_exists": os.path.isdir(pages_dir),
+        "pages_dir_files": list_dir(pages_dir),
+    }
 app.mount('/', StaticFiles(directory=STATIC_DIR, html=True), name='static')
