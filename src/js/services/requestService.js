@@ -5,6 +5,7 @@ const cache = [];
 let useSupabase = false;
 let SUPABASE_URL = null;
 let SUPABASE_ANON_KEY = null;
+const bc = (typeof window !== 'undefined' && 'BroadcastChannel' in window) ? new BroadcastChannel('request-tracker') : null;
 
 function broadcast(detail) {
     if (typeof window !== 'undefined' && window.dispatchEvent) {
@@ -13,6 +14,14 @@ function broadcast(detail) {
         } catch (e) {
             // ignore
         }
+    }
+    // send to other tabs/windows via BroadcastChannel (avoid echoing messages received from bc)
+    try {
+        if (bc && (!detail || detail.source !== 'bc')) {
+            bc.postMessage(detail || { type: 'ping' });
+        }
+    } catch (e) {
+        // ignore
     }
 }
 
@@ -76,10 +85,25 @@ class RequestService {
             cache.length = 0;
             cache.push(...rows);
             broadcast({ type: 'loaded', items: cache.slice() });
-            return;
         } catch (e) {
             console.error('Failed to load requests from Supabase', e);
             throw e;
+        }
+
+        // Setup BroadcastChannel listener to refresh cache when other tabs signal updates
+        if (bc) {
+            bc.onmessage = async (ev) => {
+                const data = ev && ev.data ? ev.data : null;
+                // avoid reacting to our own messages (we tag source when rebroadcasting)
+                try {
+                    const rows = await fetchFromSupabase();
+                    cache.length = 0;
+                    cache.push(...rows);
+                    broadcast(Object.assign({ type: 'synced' , source: 'bc' }, data || {}));
+                } catch (err) {
+                    console.error('Failed to refresh requests from Supabase on BroadcastChannel message', err);
+                }
+            };
         }
     }
 
