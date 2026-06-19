@@ -1,0 +1,12 @@
+{
+  "name": "request-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "serve -s src -l $PORT",
+    "generate-config": "node scripts/generate-config-from-env.js"
+  },
+  "dependencies": {
+    "serve": "^14.2.0"
+  }
+}
