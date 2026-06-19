@@ -7,6 +7,16 @@ import authService from "./services/authService.js";
 import requestService from "./services/requestService.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
+    // Attempt to load build-time config module (generated during static site build).
+    try {
+        const cfgModule = await import('./config/config.js');
+        if (cfgModule && cfgModule.default) {
+            window.APP_CONFIG = Object.assign({}, window.APP_CONFIG || {}, cfgModule.default);
+        }
+    } catch (e) {
+        // no build-time config present — will fall back to fetching /config from auth server or defaults
+    }
+
     // Load runtime config from the auth service (SUPABASE keys, optional AUTH_API_URL)
     const defaultAuth = 'http://127.0.0.1:8000';
     const configuredAuth = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.AUTH_API_URL) ? window.APP_CONFIG.AUTH_API_URL.replace(/\/$/, '') : null;

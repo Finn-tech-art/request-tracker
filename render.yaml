@@ -1,0 +1,35 @@
+# Render manifest to deploy the auth API and the static frontend
+# Update env values in Render dashboard or via `render.yaml` before deploying.
+
+services:
+  - type: web
+    name: request-tracker-auth
+    env: python
+    plan: free
+    buildCommand: pip install -r api/requirements.txt
+    startCommand: uvicorn api.app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ADMIN_USERNAME
+        value: "admin"
+      - key: ADMIN_PASSWORD
+        value: "admin123"
+      - key: JWT_SECRET
+        value: "change-me-for-prod"
+      - key: SUPABASE_URL
+        value: ""
+      - key: SUPABASE_ANON_KEY
+        value: ""
+
+  - type: static
+    name: request-tracker-frontend
+    env: static
+    plan: free
+    buildCommand: node scripts/generate-config-from-env.js
+    publishPath: src
+    envVars:
+      - key: AUTH_API_URL
+        value: "https://your-auth-service.onrender.com"
+      - key: SUPABASE_URL
+        value: ""
+      - key: SUPABASE_ANON_KEY
+        value: ""
