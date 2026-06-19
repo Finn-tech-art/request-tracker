@@ -1,10 +1,9 @@
 import Request from "../models/requestModel.js";
 import { generateRequestId } from "../utils/helper.js";
+import authService from "./authService.js";
 
 const cache = [];
-let useSupabase = false;
-let SUPABASE_URL = null;
-let SUPABASE_ANON_KEY = null;
+let API_BASE = null;
 const bc = (typeof window !== 'undefined' && 'BroadcastChannel' in window) ? new BroadcastChannel('request-tracker') : null;
 
 function broadcast(detail) {
@@ -53,19 +52,17 @@ function jsToDb(obj) {
     return out;
 }
 
-function supabaseHeaders() {
-    return {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
-    };
+function authHeaders() {
+    const token = authService.getToken();
+    const h = { 'Content-Type': 'application/json' };
+    if (token) h['Authorization'] = `Bearer ${token}`;
+    return h;
 }
 
-async function fetchFromSupabase() {
-    const endpoint = `${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/requests?select=*&order=created_at.desc`;
-    const res = await fetch(endpoint, { headers: supabaseHeaders() });
-    if (!res.ok) throw new Error(`Supabase fetch failed: ${res.status}`);
+async function fetchFromServer() {
+    const endpoint = `${API_BASE.replace(/\/$/, '')}/requests`;
+    const res = await fetch(endpoint, { headers: authHeaders() });
+    if (!res.ok) throw new Error(`API fetch failed: ${res.status}`);
     const rows = await res.json();
     return rows.map(dbToJs);
 }
@@ -73,20 +70,18 @@ async function fetchFromSupabase() {
 class RequestService {
     // initialize must be called after runtime config is available
     async init(config = {}) {
-        SUPABASE_URL = config.SUPABASE_URL || null;
-        SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY || null;
-        useSupabase = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
-        if (!useSupabase) {
-            throw new Error('Supabase configuration missing. SUPABASE_URL and SUPABASE_ANON_KEY are required.');
+        API_BASE = config.AUTH_API_URL || null;
+        if (!API_BASE) {
+            throw new Error('API base URL missing. AUTH_API_URL is required in config.');
         }
 
         try {
-            const rows = await fetchFromSupabase();
+            const rows = await fetchFromServer();
             cache.length = 0;
             cache.push(...rows);
             broadcast({ type: 'loaded', items: cache.slice() });
         } catch (e) {
-            console.error('Failed to load requests from Supabase', e);
+            console.error('Failed to load requests from API', e);
             throw e;
         }
 
@@ -96,7 +91,7 @@ class RequestService {
                 const data = ev && ev.data ? ev.data : null;
                 // avoid reacting to our own messages (we tag source when rebroadcasting)
                 try {
-                    const rows = await fetchFromSupabase();
+                    const rows = await fetchFromServer();
                     cache.length = 0;
                     cache.push(...rows);
                     broadcast(Object.assign({ type: 'synced' , source: 'bc' }, data || {}));
@@ -110,7 +105,7 @@ class RequestService {
     }
 
     async create(data) {
-        if (!useSupabase) throw new Error('RequestService not initialized with Supabase.');
+        if (!API_BASE) throw new Error('RequestService not initialized with API base URL.');
 
         const request = new Request({
             id: generateRequestId(),
@@ -119,23 +114,22 @@ class RequestService {
             createdAt: new Date().toISOString()
         });
 
-        const endpoint = `${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/requests`;
+        const endpoint = `${API_BASE.replace(/\/$/, '')}/requests`;
         const body = jsToDb(request);
-        if (request.id) body.id = request.id;
 
         const res = await fetch(endpoint, {
             method: 'POST',
-            headers: supabaseHeaders(),
+            headers: authHeaders(),
             body: JSON.stringify(body)
         });
 
         if (!res.ok) {
             const txt = await res.text().catch(() => '');
-            throw new Error(`Supabase create failed: ${res.status} ${txt}`);
+            throw new Error(`API create failed: ${res.status} ${txt}`);
         }
 
         const created = await res.json();
-        const row = Array.isArray(created) && created.length > 0 ? dbToJs(created[0]) : dbToJs(created);
+        const row = dbToJs(created);
         cache.push(row);
         broadcast({ type: 'create', item: row });
         return row;
@@ -156,13 +150,13 @@ class RequestService {
         cache[idx] = updated;
         broadcast({ type: 'update', item: updated });
 
-        if (!useSupabase) throw new Error('RequestService not initialized with Supabase.');
+        if (!API_BASE) throw new Error('RequestService not initialized with API base URL.');
 
-        const endpoint = `${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/requests?id=eq.${encodeURIComponent(id)}`;
+        const endpoint = `${API_BASE.replace(/\/$/, '')}/requests/${encodeURIComponent(id)}`;
         const body = jsToDb(changes);
         const res = await fetch(endpoint, {
             method: 'PATCH',
-            headers: supabaseHeaders(),
+            headers: authHeaders(),
             body: JSON.stringify(body)
         });
 

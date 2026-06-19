@@ -95,9 +95,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         } catch (e) { /* ignore DOM errors */ }
     }
 
-    // Initialize the request service only if we have Supabase config. Otherwise, warn but don't block the UI.
-    const finalHasSupabase = !!(window.APP_CONFIG && window.APP_CONFIG.SUPABASE_URL && window.APP_CONFIG.SUPABASE_ANON_KEY);
-    if (finalHasSupabase) {
+    // Initialize the request service only if we have an API base URL (AUTH_API_URL).
+    const finalHasApi = !!(window.APP_CONFIG && window.APP_CONFIG.AUTH_API_URL);
+    if (finalHasApi) {
         try {
             await requestService.init(window.APP_CONFIG || {});
         } catch (e) {
@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             showBackendWarning();
         }
     } else {
-        console.warn('Supabase config missing; skipping data backend init.');
+        console.warn('API base URL missing (AUTH_API_URL); skipping data backend init.');
         showBackendWarning();
     }
 
