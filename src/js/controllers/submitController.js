@@ -8,7 +8,7 @@ export function initializeSubmitPage() {
 
     if (!form) return;
 
-    form.addEventListener("submit", (event) => {
+    form.addEventListener("submit", async (event) => {
 
         event.preventDefault();
 
@@ -38,13 +38,15 @@ export function initializeSubmitPage() {
 
         }
 
-        requestService.create(formData);
-
-        alert("Request submitted successfully!");
-
-        form.reset();
-
-        window.location.href = "./requests.html";
+        try {
+            await requestService.create(formData);
+            alert("Request submitted successfully!");
+            form.reset();
+            window.location.href = "./requests.html";
+        } catch (e) {
+            console.error('Failed to submit request', e);
+            alert('Failed to submit request. Please try again or contact admin.');
+        }
 
     });
 

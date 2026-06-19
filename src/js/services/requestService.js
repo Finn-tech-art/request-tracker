@@ -1,49 +1,156 @@
-import Request from"../models/requestModel.js";
+import Request from "../models/requestModel.js";
 import { generateRequestId } from "../utils/helper.js";
 
-import {
-    getRequests,
-    saveRequests
-} from "./storageService.js"
+const cache = [];
+let useSupabase = false;
+let SUPABASE_URL = null;
+let SUPABASE_ANON_KEY = null;
+
+function broadcast(detail) {
+    if (typeof window !== 'undefined' && window.dispatchEvent) {
+        try {
+            window.dispatchEvent(new CustomEvent('request-updated', { detail }));
+        } catch (e) {
+            // ignore
+        }
+    }
+}
+
+function dbToJs(row) {
+    if (!row) return null;
+    return new Request({
+        id: row.id,
+        name: row.name,
+        email: row.email,
+        product: row.product,
+        requestType: row.request_type,
+        priority: row.priority || '',
+        message: row.message,
+        status: row.status || 'Open',
+        createdAt: row.created_at || new Date().toISOString()
+    });
+}
+
+function jsToDb(obj) {
+    const out = {};
+    if (obj.name !== undefined) out.name = obj.name;
+    if (obj.email !== undefined) out.email = obj.email;
+    if (obj.product !== undefined) out.product = obj.product;
+    if (obj.requestType !== undefined) out.request_type = obj.requestType;
+    if (obj.priority !== undefined) out.priority = obj.priority;
+    if (obj.message !== undefined) out.message = obj.message;
+    if (obj.status !== undefined) out.status = obj.status;
+    if (obj.createdAt !== undefined) out.created_at = obj.createdAt;
+    return out;
+}
+
+function supabaseHeaders() {
+    return {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+    };
+}
+
+async function fetchFromSupabase() {
+    const endpoint = `${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/requests?select=*&order=created_at.desc`;
+    const res = await fetch(endpoint, { headers: supabaseHeaders() });
+    if (!res.ok) throw new Error(`Supabase fetch failed: ${res.status}`);
+    const rows = await res.json();
+    return rows.map(dbToJs);
+}
 
 class RequestService {
-    create(data) {
-        const requests = getRequests();
+    // initialize must be called after runtime config is available
+    async init(config = {}) {
+        SUPABASE_URL = config.SUPABASE_URL || null;
+        SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY || null;
+        useSupabase = !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+        if (!useSupabase) {
+            throw new Error('Supabase configuration missing. SUPABASE_URL and SUPABASE_ANON_KEY are required.');
+        }
+
+        try {
+            const rows = await fetchFromSupabase();
+            cache.length = 0;
+            cache.push(...rows);
+            broadcast({ type: 'loaded', items: cache.slice() });
+            return;
+        } catch (e) {
+            console.error('Failed to load requests from Supabase', e);
+            throw e;
+        }
+    }
+
+    async create(data) {
+        if (!useSupabase) throw new Error('RequestService not initialized with Supabase.');
+
         const request = new Request({
             id: generateRequestId(),
             ...data,
-            status: "Open"
+            status: 'Open',
+            createdAt: new Date().toISOString()
         });
 
-        requests.push(request);
-        saveRequests(requests);
-        return request;
+        const endpoint = `${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/requests`;
+        const body = jsToDb(request);
+        if (request.id) body.id = request.id;
+
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: supabaseHeaders(),
+            body: JSON.stringify(body)
+        });
+
+        if (!res.ok) {
+            const txt = await res.text().catch(() => '');
+            throw new Error(`Supabase create failed: ${res.status} ${txt}`);
+        }
+
+        const created = await res.json();
+        const row = Array.isArray(created) && created.length > 0 ? dbToJs(created[0]) : dbToJs(created);
+        cache.push(row);
+        broadcast({ type: 'create', item: row });
+        return row;
     }
 
     getAll() {
-        return getRequests();
+        return cache.slice();
     }
 
     getById(id) {
-        const requests = getRequests();
-        return requests.find(request => request.id === id);
+        return cache.find(r => r.id === id) || null;
     }
 
     update(id, changes) {
-        const requests = getRequests();
-        const idx = requests.findIndex(r => r.id === id);
+        const idx = cache.findIndex(r => r.id === id);
         if (idx === -1) return null;
-        const updated = { ...requests[idx], ...changes };
-        requests[idx] = updated;
-        saveRequests(requests);
-        if (typeof window !== 'undefined' && window.dispatchEvent) {
-            try {
-                window.dispatchEvent(new CustomEvent('request-updated', { detail: updated }));
-            } catch (e) {
-                // ignore
-            }
+        const updated = { ...cache[idx], ...changes };
+        cache[idx] = updated;
+        broadcast({ type: 'update', item: updated });
+
+        if (!useSupabase) throw new Error('RequestService not initialized with Supabase.');
+
+        const endpoint = `${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/requests?id=eq.${encodeURIComponent(id)}`;
+        const body = jsToDb(changes);
+        const res = await fetch(endpoint, {
+            method: 'PATCH',
+            headers: supabaseHeaders(),
+            body: JSON.stringify(body)
+        });
+
+        if (!res.ok) {
+            const txt = await res.text().catch(() => '');
+            throw new Error(`Supabase update failed: ${res.status} ${txt}`);
         }
-        return updated;
+
+        const updatedRows = await res.json();
+        const row = Array.isArray(updatedRows) && updatedRows.length > 0 ? dbToJs(updatedRows[0]) : dbToJs(updatedRows);
+        const i = cache.findIndex(r => r.id === id || r.id === row.id);
+        if (i !== -1) cache[i] = row; else cache.push(row);
+        broadcast({ type: 'update', item: row });
+        return row;
     }
 }
 

@@ -87,15 +87,16 @@ export function showRequestModal(request, { editable = false } = {}) {
     if (editable) {
       const saveBtn = overlay.querySelector('.rt-modal-save');
       if (saveBtn) {
-        saveBtn.addEventListener('click', () => {
+        saveBtn.addEventListener('click', async () => {
           const sel = overlay.querySelector('#rt-status-select');
           if (!sel) return;
           const newStatus = sel.value;
           if (!newStatus) return;
           try {
-            requestService.update(request.id, { status: newStatus });
+            await requestService.update(request.id, { status: newStatus });
           } catch (e) {
             console.error('Failed to update request status', e);
+            alert('Failed to update status.');
           }
           closeRequestModal();
         });

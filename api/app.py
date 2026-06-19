@@ -28,6 +28,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Supabase config (loaded from environment)
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
+DEPLOY_AUTH_URL = os.getenv("AUTH_API_URL")
+
 
 class Creds(BaseModel):
     username: str
@@ -62,3 +67,17 @@ async def verify(authorization: Optional[str] = Header(None)):
         raise HTTPException(status_code=401, detail="Token expired")
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+
+@app.get("/config")
+async def get_config():
+    """Return public configuration values used by the frontend.
+
+    This includes SUPABASE_URL and SUPABASE_ANON_KEY. These values are intended
+    to be public (anon key) and are safe to expose to client-side code.
+    """
+    return {
+        "SUPABASE_URL": SUPABASE_URL,
+        "SUPABASE_ANON_KEY": SUPABASE_ANON_KEY,
+        "AUTH_API_URL": DEPLOY_AUTH_URL or None,
+    }

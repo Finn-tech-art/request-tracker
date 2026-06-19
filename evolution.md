@@ -49,3 +49,10 @@ To handle admin login using a hardcoded username and password that I provide as 
 I had trouble with how I was gonna host the app now that I was using python to handle login in which meant the app needed a backend ... I decided to use render to host the app. So i needed an api
 found at app.py
 
+
+I then integrated supabase into the app. 
+
+requestService.js - Exposes init(config) to initialize Supabase config (SUPABASE_URL, SUPABASE_ANON_KEY) and pre-load requests from Supabase when available.
+ it also Uses Supabase REST (PostgREST) endpoints to GET, POST, and PATCH requests.
+Keeps an in-memory cache and broadcasts request-updated events as before.
+Falls back to localStorage if Supabase is not configured or request fails.
