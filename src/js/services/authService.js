@@ -1,34 +1,57 @@
 const SESSION_KEY = "request-tracker-session";
 const TOKEN_KEY = "rt_jwt";
 
+function setCookie(name, value, days) {
+    try {
+        let str = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; path=/`;
+        if (typeof days === 'number') {
+            const expires = new Date(Date.now() + days * 864e5).toUTCString();
+            str += `; expires=${expires}`;
+        }
+        document.cookie = str;
+    } catch (e) { /* ignore */ }
+}
+
+function getCookie(name) {
+    try {
+        const match = document.cookie.split('; ').find(row => row.startsWith(`${encodeURIComponent(name)}=`));
+        if (!match) return null;
+        return decodeURIComponent(match.split('=')[1] || '');
+    } catch (e) { return null; }
+}
+
+function deleteCookie(name) {
+    try {
+        document.cookie = `${encodeURIComponent(name)}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+    } catch (e) { /* ignore */ }
+}
+
 function getSession() {
-    const raw = localStorage.getItem(SESSION_KEY);
-    return raw ? JSON.parse(raw) : null;
+    const raw = getCookie(SESSION_KEY);
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch (e) { return null; }
 }
 
 function setSession(session) {
-    if (session === null) {
-        localStorage.removeItem(SESSION_KEY);
-    } else {
-        localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-    }
+    if (session === null) deleteCookie(SESSION_KEY);
+    else setCookie(SESSION_KEY, JSON.stringify(session), 1);
 }
 
 function clearSession() {
-    localStorage.removeItem(SESSION_KEY);
+    deleteCookie(SESSION_KEY);
 }
 
 function getToken() {
-    return localStorage.getItem(TOKEN_KEY);
+    return getCookie(TOKEN_KEY);
 }
 
 function setToken(token) {
-    if (token == null) localStorage.removeItem(TOKEN_KEY);
-    else localStorage.setItem(TOKEN_KEY, token);
+    if (token == null) deleteCookie(TOKEN_KEY);
+    else setCookie(TOKEN_KEY, token); // session cookie
 }
 
 function clearToken() {
-    localStorage.removeItem(TOKEN_KEY);
+    deleteCookie(TOKEN_KEY);
 }
 
 function logout() {
