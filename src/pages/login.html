@@ -84,36 +84,6 @@
 
 <script type="module" src="../js/app.js"></script>
 
-<script>
-(function(){
-    const el = document.getElementById('auth-help');
-    if (!el) return;
-    const defaultLocal = 'http://127.0.0.1:8000';
-    const remote = (window.APP_CONFIG && window.APP_CONFIG.AUTH_API_URL) ? window.APP_CONFIG.AUTH_API_URL.replace(/\/$/, '') : defaultLocal;
-    el.textContent = `Checking auth server at ${remote}...`;
-    (async () => {
-        try {
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 3000);
-            const res = await fetch(`${remote}/openapi.json`, { signal: controller.signal });
-            clearTimeout(timeout);
-            if (res && res.ok) {
-                el.innerHTML = `Auth server reachable at <strong>${remote}</strong>. Login will use this service.`;
-                el.style.background = '#e6ffed';
-                el.style.color = '#064e3b';
-            } else {
-                el.innerHTML = `Auth server responded (${res ? res.status : 'no response'}). If login fails, start the auth server locally: <code>uvicorn api.app:app --reload --host 127.0.0.1 --port 8000</code> or set <code>window.APP_CONFIG.AUTH_API_URL</code>.`;
-                el.style.background = '#fff7ed';
-                el.style.color = '#92400e';
-            }
-        } catch (err) {
-            el.innerHTML = `Cannot reach auth server at <strong>${remote}</strong>.<br>Please start it locally with:<br><code>uvicorn api.app:app --reload --host 127.0.0.1 --port 8000</code><br>Or set <code>window.APP_CONFIG.AUTH_API_URL</code> to your deployed auth service.`;
-            el.style.background = '#fff1f2';
-            el.style.color = '#7f1d1d';
-        }
-    })();
-})();
-</script>
 
 </body>
 </html>
