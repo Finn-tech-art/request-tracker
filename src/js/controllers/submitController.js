@@ -42,7 +42,7 @@ export function initializeSubmitPage() {
             await requestService.create(formData);
             alert("Request submitted successfully!");
             form.reset();
-            window.location.href = "./requests.html";
+            window.location.href = "/requests";
         } catch (e) {
             console.error('Failed to submit request', e);
             alert('Failed to submit request. Please try again or contact admin.');

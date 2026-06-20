@@ -113,7 +113,7 @@ async def _call_supabase(method: str, path: str, json_payload=None, params=None)
         return resp.text
 
 
-@app.get('/requests')
+@app.get('/api/requests')
 async def list_requests():
     """Return all requests (proxied from Supabase)."""
     rows = await _call_supabase('GET', '/requests', params={'select': '*', 'order': 'created_at.desc'})
@@ -130,6 +130,7 @@ class RequestIn(BaseModel):
     status: Optional[str] = 'Open'
 
 
+@app.post('/api/requests', status_code=status.HTTP_201_CREATED)
 @app.post('/requests', status_code=status.HTTP_201_CREATED)
 async def create_request(req: RequestIn):
     payload = {
@@ -147,6 +148,7 @@ async def create_request(req: RequestIn):
     return created[0] if isinstance(created, list) and len(created) > 0 else created
 
 
+@app.patch('/api/requests/{request_id}')
 @app.patch('/requests/{request_id}')
 async def patch_request(request_id: str, patch: dict, authorization: Optional[str] = Header(None)):
     # Only allow updates from authenticated admin users
@@ -195,6 +197,7 @@ async def submit_page_alias():
 
 
 @app.get("/requests.html", include_in_schema=False)
+@app.get("/requests", include_in_schema=False)
 async def requests_page_alias():
     return _serve_frontend_page("requests.html")
 

@@ -5,7 +5,7 @@ import authService from "../services/authService.js";
 
 export function initializeDashboardPage() {
     if (!authService.isLoggedIn()) {
-        window.location.href = './login.html';
+        window.location.href = '/login';
         return;
     }
     const totalEl = document.getElementById("totalRequests");

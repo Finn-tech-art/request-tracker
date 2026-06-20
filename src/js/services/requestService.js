@@ -60,7 +60,7 @@ function authHeaders() {
 }
 
 async function fetchFromServer() {
-    const endpoint = `${API_BASE.replace(/\/$/, '')}/requests`;
+    const endpoint = `${API_BASE.replace(/\/$/, '')}/api/requests`;
     const res = await fetch(endpoint, { headers: authHeaders() });
     if (!res.ok) throw new Error(`API fetch failed: ${res.status}`);
     const rows = await res.json();
@@ -114,7 +114,7 @@ class RequestService {
             createdAt: new Date().toISOString()
         });
 
-        const endpoint = `${API_BASE.replace(/\/$/, '')}/requests`;
+        const endpoint = `${API_BASE.replace(/\/$/, '')}/api/requests`;
         const body = jsToDb(request);
 
         const res = await fetch(endpoint, {
@@ -152,7 +152,7 @@ class RequestService {
 
         if (!API_BASE) throw new Error('RequestService not initialized with API base URL.');
 
-        const endpoint = `${API_BASE.replace(/\/$/, '')}/requests/${encodeURIComponent(id)}`;
+        const endpoint = `${API_BASE.replace(/\/$/, '')}/api/requests/${encodeURIComponent(id)}`;
         const body = jsToDb(changes);
         const res = await fetch(endpoint, {
             method: 'PATCH',

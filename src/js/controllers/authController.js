@@ -35,7 +35,7 @@ export function initializeAuthPage() {
 				const session = { username: data.username || username, name: data.name || '', isAdmin: !!data.isAdmin };
 				authService.setSession(session);
 				if (data.token) authService.setToken(data.token);
-				window.location.href = './dashboard.html';
+				window.location.href = '/dashboard';
 				return;
 			}
 			// Non-OK response (401 expected for bad creds)
