@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from typing import Optional
+from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException, Header, Request
 from fastapi.staticfiles import StaticFiles
@@ -121,6 +122,7 @@ async def list_requests():
 
 
 class RequestIn(BaseModel):
+    id: Optional[str] = None
     name: str
     email: str
     product: Optional[str] = None
@@ -134,6 +136,7 @@ class RequestIn(BaseModel):
 @app.post('/requests', status_code=status.HTTP_201_CREATED)
 async def create_request(req: RequestIn):
     payload = {
+        'id': req.id or f"REQ-{uuid4().hex[:12].upper()}",
         'name': req.name,
         'email': req.email,
         'product': req.product,

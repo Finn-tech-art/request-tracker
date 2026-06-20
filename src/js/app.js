@@ -109,20 +109,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         showBackendWarning();
     }
 
-    const page = window.location.pathname;
+    const page = window.location.pathname.replace(/\/$/, "") || "/";
 
-    if (page.includes("login.html")) {
+    if (page === "/login" || page.endsWith("/login.html")) {
         initializeAuthPage();
     }
 
-    if (page.includes("submit.html")) {
+    if (page === "/submit" || page.endsWith("/submit.html")) {
         initializeSubmitPage();
     }
 
-    if (page.includes("requests.html")) {
+    if (page === "/requests" || page.endsWith("/requests.html")) {
         initializeRequestPage();
     }
-    if (page.includes("dashboard.html")) {
+    if (page === "/dashboard" || page.endsWith("/dashboard.html")) {
         initializeDashboardPage();
     }
 

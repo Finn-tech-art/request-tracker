@@ -41,6 +41,7 @@ function dbToJs(row) {
 
 function jsToDb(obj) {
     const out = {};
+    if (obj.id !== undefined) out.id = obj.id;
     if (obj.name !== undefined) out.name = obj.name;
     if (obj.email !== undefined) out.email = obj.email;
     if (obj.product !== undefined) out.product = obj.product;

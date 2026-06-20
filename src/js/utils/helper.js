@@ -1,6 +1,6 @@
 export function generateRequestId() {
-    const random = Math.floor(Math.random() * 9000) + 1000;
-    return `REQ-${random}`;
+    const random = Math.floor(Math.random() * 900000) + 100000;
+    return `REQ-${Date.now()}-${random}`;
 }
 
 export function formatDate(date) {
