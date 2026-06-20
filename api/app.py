@@ -5,7 +5,7 @@ from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Header, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import Response
+from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel
 import jwt
 import httpx
@@ -182,6 +182,35 @@ async def serve_config_js():
 
 # Serve the static frontend from the `src` directory so the Python service can be the sole origin.
 STATIC_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+
+def _serve_frontend_page(filename: str):
+    return FileResponse(os.path.join(STATIC_DIR, "pages", filename))
+
+
+@app.get("/submit.html", include_in_schema=False)
+@app.get("/submit", include_in_schema=False)
+async def submit_page_alias():
+    return _serve_frontend_page("submit.html")
+
+
+@app.get("/requests.html", include_in_schema=False)
+async def requests_page_alias():
+    return _serve_frontend_page("requests.html")
+
+
+@app.get("/login.html", include_in_schema=False)
+@app.get("/login", include_in_schema=False)
+async def login_page_alias():
+    return _serve_frontend_page("login.html")
+
+
+@app.get("/dashboard.html", include_in_schema=False)
+@app.get("/dashboard", include_in_schema=False)
+async def dashboard_page_alias():
+    return _serve_frontend_page("dashboard.html")
+
+
 @app.get("/__debug/static-files")
 async def debug_static_files():
     pages_dir = os.path.join(STATIC_DIR, "pages")
